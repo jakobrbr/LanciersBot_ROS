@@ -17,7 +17,6 @@
 #include "esp_system.h"
 
 // microros util
-#include <ros.h>
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
