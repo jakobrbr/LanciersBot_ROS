@@ -103,8 +103,8 @@ void microRosTask()
     RCCHECK(rclc_node_init_default(&node, "LanciersBot", "", &support));
 
     // create subscriber, expecting msg in format of /cmd_vel, connect to topic /cmd_vel
-    RCCHECK(rclc_subscription_init_default(
-        // TO DO, create publisher for returning battery voltage
+    //initiated to connect with best effort for faster communication
+    RCCHECK(rclc_subscription_init_best_effort(
         &subscriber,
         &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
@@ -118,7 +118,7 @@ void microRosTask()
         "/batt_volt"));
 
     // Create timer.
-    const unsigned int timer_timeout = 1000;
+    const unsigned int timer_timeout = 100;
     RCCHECK(rclc_timer_init_default(
         &timer,
         &support,
@@ -135,7 +135,7 @@ void microRosTask()
 
     while (1)
     {
-        rclc_executor_spin_some(&executor, RCL_MS_TO_NS(1000));
+        rclc_executor_spin_some(&executor, RCL_MS_TO_NS(1));
         usleep(RCL_MS_TO_NS(1000));
     }
     // free mem
