@@ -74,7 +74,6 @@ geometry_msgs__msg__Twist msg;
 
 
 
-void initMsg();
 float batteryVoltage();
 void cmd_vel_callback();
 void timer_callback();
@@ -176,6 +175,5 @@ float batteryVoltage()
 void appMain()
 {
     setup();
-    initMsg();
     microRosTask();
 }
