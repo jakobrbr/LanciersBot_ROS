@@ -66,7 +66,7 @@
 #define PWM_resolution LEDC_TIMER_10_BIT
 #define PWM_timer LEDC_TIMER_1
 #define PWM_FREQ 30000
-#define PWM_spdMode LEDC_HIGH_SPEED_MODE
+#define PWM_spdMode LEDC_LOW_SPEED_MODE
 #define PWM_min 600
 #define PWM_max 1023
 
@@ -203,7 +203,6 @@ void setup(){
     }
 
     void timer_callback(rcl_timer_t * timer, int64_t last_call_time){
-        RCLC_UNUSED(last_call_time);
         if (timer == NULL)
         {
              //send battery data back
@@ -229,12 +228,12 @@ void setup(){
          */
         // takes input of linear velocity and angle 
         // all of this code has been taken from github.com/Reinbert/ros_esp32cam_diffdrive
-        vel = constrain(vel, -1, 1);
-        a = constrain(a, -1, 1);
+        float norm_vel = constrain(vel, -1, 1);
+        float norm_a = constrain(a, -1, 1);
 
         // calculate wheel velocities
-        float lVel = (vel - a) / 2.0f; // taken from github - use wheel distance/size??
-        float rVel = (vel + a) / 2.0f;
+        float lVel = (norm_vel - norm_a) / 2.0f; // taken from github - use wheel distance/size??
+        float rVel = (norm_vel + norm_a) / 2.0f;
 
         // map velocity to pwm
         uint16_t pwmLeft  = (uint16_t)((fabs(lVel)) * (PWM_max - PWM_min) / (1) + PWM_min);
