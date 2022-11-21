@@ -60,6 +60,8 @@
 #define PWM_timer LEDC_TIMER_1
 #define PWM_FREQ 30
 #define PWM_spdMode LEDC_LOW_SPEED_MODE
+#define PWM_min 600
+#define PWM_max 1023
 
 // setting PWM channels
 #define PWM_R1 LEDC_CHANNEL_0
@@ -94,41 +96,45 @@ void setup()
         .duty_resolution = PWM_resolution,
         .freq_hz = PWM_FREQ,
         .speed_mode = PWM_spdMode,
-        .timer_num = PWM_timer
-                         .clk_cfg = LEDC_AUTO_CLK,
+        .timer_num = PWM_timer,
+        .clk_cfg = LEDC_AUTO_CLK
     };
     ledc_timer_config(&ledc_timer);
 
-    ledc_channel_config_t ledc_channel[i] = {
-        {.channel = PWM_LEFT_FORWARD,
+    ledc_channel_config_t ledc_channel[4] = {
+        {.channel = PWM_L1,
          .duty = 0,
-         .gpio_num = PIN_LEFT_FORWARD,
+         .gpio_num = PinL1,
+         .speed_mode = PWM_spdMode,
+         .hpoint = 0,
+         .timer_sel = PWM_timer},
+
+        {.channel = PWM_L2,
+         .duty = 0,
+         .gpio_num = PinL2,
          .speed_mode = PWM_MODE,
          .hpoint = 0,
-         .timer_sel = LEDC_TIMER_1},
-        {.channel = PWM_LEFT_BACKWARD,
+         .timer_sel = PWM_timer},
+
+        {.channel = PWM_R1,
          .duty = 0,
-         .gpio_num = PIN_LEFT_BACKWARD,
-         .speed_mode = PWM_MODE,
+         .gpio_num = PinR1,
+         .speed_mode = PWM_spdMode,
          .hpoint = 0,
-         .timer_sel = LEDC_TIMER_1},
-        {.channel = PWM_RIGHT_FORWARD,
+         .timer_sel = PWM_timer},
+
+        {.channel = PWM_R2,
          .duty = 0,
-         .gpio_num = PIN_RIGHT_FORWARD,
-         .speed_mode = PWM_MODE,
+         .gpio_num = PinR2,
+         .speed_mode = PWM_spdMode,
          .hpoint = 0,
-         .timer_sel = LEDC_TIMER_1},
-        {.channel = PWM_RIGHT_BACKWARD,
-         .duty = 0,
-         .gpio_num = PIN_RIGHT_BACKWARD,
-         .speed_mode = PWM_MODE,
-         .hpoint = 0,
-         .timer_sel = LEDC_TIMER_1},
+         .timer_sel = PWM_timer},
     };
     for (int i = 0; i < 4; i++)
     {
         ledc_channel_config(&ledc_channel[i]);
     }
+}
     void microRosTask()
     {
         rcl_timer_t timer = rcl_get_zero_initialized_timer();
@@ -206,7 +212,7 @@ void setup()
             printf("Sent: %f\n", battery_msg.data);
             
             //run motor,
-            motorControl(msg.Linear.x,msg.angular.z)
+            motorControl(msg.linear.x,msg.angular.z);
     }
     // Calculates the current battery voltage
     float batteryVoltage()
@@ -234,18 +240,18 @@ void setup()
         float rVel = (vel + a) / 2.0f;
 
         // map velocity to pwm
-        uint16_t pwmLeft = (uint16_t)fmap(fabs(lVel), 0, 1, pwm_min, pwm_max);
-        uint16_t pwmRight = (uint16_t)fmap(fabs(rVel), 0, 1, pwm_min, pwm_max);
+        uint16_t pwmLeft  = (uint16_t)((fabs(lVel)) * (PWM_max - PWM_min) / (1) + PWM_min);
+        uint16_t pwmRight = (uint16_t)((fabs(rVel)) * (PWM_max - PWM_min) / (1) + PWM_min);
+        
+        ledc_set_duty(PWM_spdMode, PWM_L1, pwmLeft * (lVel > 0));
+        ledc_set_duty(PWM_spdMode, PWM_L2, pwmLeft * (lVel < 0));
+        ledc_set_duty(PWM_spdMode, PWM_R1, pwmRight * (rVel > 0));
+        ledc_set_duty(PWM_spdMode, PWM_R2, pwmRight * (rVel < 0));
 
-        ledc_set_duty(PWM_MODE, PWM_LEFT_FORWARD, pwmLeft * (lVel > 0));
-        ledc_set_duty(PWM_MODE, PWM_LEFT_BACKWARD, pwmLeft * (lVel < 0));
-        ledc_set_duty(PWM_MODE, PWM_RIGHT_FORWARD, pwmRight * (rVel > 0));
-        ledc_set_duty(PWM_MODE, PWM_RIGHT_BACKWARD, pwmRight * (rVel < 0));
-
-        ledc_update_duty(PWM_MODE, PWM_LEFT_FORWARD);
-        ledc_update_duty(PWM_MODE, PWM_LEFT_BACKWARD);
-        ledc_update_duty(PWM_MODE, PWM_RIGHT_FORWARD);
-        ledc_update_duty(PWM_MODE, PWM_RIGHT_BACKWARD);
+        ledc_update_duty(PWM_spdMode, PWM_L1);
+        ledc_update_duty(PWM_spdMode, PWM_L2);
+        ledc_update_duty(PWM_spdMode, PWM_R1);
+        ledc_update_duty(PWM_spdMode, PWM_R2);
     }
     void appMain()
     {
