@@ -57,6 +57,11 @@
 #define PinL1 GPIO_NUM_26 // Forward left
 #define PinL2 GPIO_NUM_25 // Backwards left
 
+#define LEDC_OUTPUT_IO PinR1
+#define LEDC_OUTPUT_IO PinR2
+#define LEDC_OUTPUT_IO PinL1
+#define LEDC_OUTPUT_IO PinL2
+
 // PWM parameters
 #define PWM_resolution LEDC_TIMER_10_BIT
 #define PWM_timer LEDC_TIMER_1
