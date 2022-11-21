@@ -25,6 +25,8 @@
 #include <std_msgs/msg/float32.h>
 #include <geometry_msgs/msg/twist.h>
 
+//macros functions, Constrain from arduino.h and RCCHECK from microros examples
+#define constrain(amt, low, high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 #define RCCHECK(fn)                                                                      \
     {                                                                                    \
         rcl_ret_t temp_rc = fn;                                                          \
@@ -76,10 +78,10 @@ static rcl_subscription_t subscriber;
 geometry_msgs__msg__Twist msg;
 
 void setup();
-void motorControl();
+void motorControl(float vel, float a);
 float batteryVoltage();
-void cmd_vel_callback();
-void timer_callback();
+void cmd_vel_callback(const void *msgin);
+void timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void microRosTask();
 
 void setup(){
