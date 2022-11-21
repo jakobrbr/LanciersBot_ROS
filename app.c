@@ -197,10 +197,8 @@ void setup(){
     }
 
     void timer_callback(rcl_timer_t * timer, int64_t last_call_time){
-        // TO DO:
-        // Write program for controlling motors
         RCLC_UNUSED(last_call_time);
-        if (timer != NULL)
+        if (timer == NULL)
         {
             return;
         }
@@ -224,9 +222,7 @@ void setup(){
          * vel is the linear velocity and is a value between -1 and 1, with 1 being top speed forward.
          * a is the angle and is a value between -1 and 1. right is -1 and left is 1
          */
-
-        // constrain input values?
-        // takes input of linear velocity and angle (float?)
+        // takes input of linear velocity and angle 
         // all of this code has been taken from github.com/Reinbert/ros_esp32cam_diffdrive
         vel = constrain(vel, -1, 1);
         a = constrain(a, -1, 1);
