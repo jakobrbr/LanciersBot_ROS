@@ -46,16 +46,16 @@
     }
 
 // define system pins
-#define stayOn GPIO_NUM_17
+#define stayOn 17
 #define vSens ADC1_CHANNEL_5
-#define ledb GPIO_NUM_4
-#define ledg GPIO_NUM_16
+#define ledb 4
+#define ledg 16
 
 // define motor pins
-#define PinR1 GPIO_NUM_21 // Forward right
-#define PinR2 GPIO_NUM_22 // Backwards right
-#define PinL1 GPIO_NUM_26 // Forward left
-#define PinL2 GPIO_NUM_25 // Backwards left
+#define PinR1 21 // Forward right
+#define PinR2 22 // Backwards right
+#define PinL1 26 // Forward left
+#define PinL2 25 // Backwards left
 
 #define LEDC_OUTPUT_IO PinR1
 #define LEDC_OUTPUT_IO PinR2
