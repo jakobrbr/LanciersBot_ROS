@@ -82,8 +82,7 @@ void cmd_vel_callback();
 void timer_callback();
 void microRosTask();
 
-void setup()
-{
+void setup(){
     // TO DO define struct for setting motors
     gpio_set_direction(stayOn, GPIO_MODE_OUTPUT);
     gpio_set_direction(vSens, GPIO_MODE_INPUT);
@@ -112,7 +111,7 @@ void setup()
         {.channel = PWM_L2,
          .duty = 0,
          .gpio_num = PinL2,
-         .speed_mode = PWM_MODE,
+         .speed_mode = PWM_spdMode,
          .hpoint = 0,
          .timer_sel = PWM_timer},
 
@@ -135,8 +134,7 @@ void setup()
         ledc_channel_config(&ledc_channel[i]);
     }
 }
-    void microRosTask()
-    {
+    void microRosTask(){
         rcl_timer_t timer = rcl_get_zero_initialized_timer();
         rcl_allocator_t allocator = rcl_get_default_allocator();
 
@@ -191,14 +189,12 @@ void setup()
         vTaskDelete(NULL);
     }
 
-    void cmd_vel_callback(const void *msgin)
-    {
+    void cmd_vel_callback(const void *msgin){
         const geometry_msgs__msg__Twist *msg = (const geometry_msgs__msg__Twist *)msgin;
         printf("Message received: %f %f\n", msg->linear.x, msg->angular.z);
     }
 
-    void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
-    {
+    void timer_callback(rcl_timer_t * timer, int64_t last_call_time){
         // TO DO:
         // Write program for controlling motors
         RCLC_UNUSED(last_call_time);
@@ -215,14 +211,12 @@ void setup()
             motorControl(msg.linear.x,msg.angular.z);
     }
     // Calculates the current battery voltage
-    float batteryVoltage()
-    {
+    float batteryVoltage(){
         float vMeas = adc1_get_raw(ADC1_CHANNEL_5) * 3.3 / 4096;    // get voltage from adc
         float vBatt = vMeas * (100 * 10e3 + 22 * 10e3) / 22 * 10e3; // calculate battery voltage from voltagedivider circuit
         return vBatt;
     }
-    void motorControl(float vel, float a)
-    {
+    void motorControl(float vel, float a){
         /* this is code for steering the robot
          * it calculates what pwm values to output, but not for how long
          * vel is the linear velocity and is a value between -1 and 1, with 1 being top speed forward.
@@ -253,8 +247,7 @@ void setup()
         ledc_update_duty(PWM_spdMode, PWM_R1);
         ledc_update_duty(PWM_spdMode, PWM_R2);
     }
-    void appMain()
-    {
+    void appMain(){
         setup();
         microRosTask();
     }
