@@ -60,7 +60,7 @@
 // PWM parameters
 #define PWM_resolution LEDC_TIMER_10_BIT
 #define PWM_timer LEDC_TIMER_1
-#define PWM_FREQ 30
+#define PWM_FREQ 30000
 #define PWM_spdMode LEDC_HIGH_SPEED_MODE
 #define PWM_min 600
 #define PWM_max 1023
