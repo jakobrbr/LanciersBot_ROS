@@ -61,20 +61,20 @@
 #define PWM_resolution LEDC_TIMER_10_BIT
 #define PWM_timer LEDC_TIMER_1
 #define PWM_FREQ 30
-#define PWM_spdMode LEDC_LOW_SPEED_MODE
+#define PWM_spdMode LEDC_HIGH_SPEED_MODE
 #define PWM_min 600
 #define PWM_max 1023
 
 // setting PWM channels
 #define PWM_R1 LEDC_CHANNEL_0
-#define PWM_R2 LEDC_CHANNEL_1
-#define PWM_L1 LEDC_CHANNEL_2
-#define PWM_L2 LEDC_CHANNEL_3
+#define PWM_R2 LEDC_CHANNEL_2
+#define PWM_L1 LEDC_CHANNEL_4
+#define PWM_L2 LEDC_CHANNEL_7
 
-static rcl_publisher_t publisher;
+rcl_publisher_t publisher;
 std_msgs__msg__Float32 battery_msg;
 
-static rcl_subscription_t subscriber;
+rcl_subscription_t subscriber;
 geometry_msgs__msg__Twist msg;
 
 void setup();
@@ -137,7 +137,7 @@ void setup(){
     }
 }
     void microRosTask(){
-        rcl_timer_t timer = rcl_get_zero_initialized_timer();
+        
         rcl_allocator_t allocator = rcl_get_default_allocator();
 
         // microRos INIT options
@@ -163,6 +163,7 @@ void setup(){
             "/batt_volt"));
 
         // Create timer.
+        rcl_timer_t timer = rcl_get_zero_initialized_timer();
         const unsigned int timer_timeout = 100;
         RCCHECK(rclc_timer_init_default(
             &timer,
@@ -200,13 +201,12 @@ void setup(){
         RCLC_UNUSED(last_call_time);
         if (timer == NULL)
         {
-            return;
-        }
-            //send battery data back
+             //send battery data back
             battery_msg.data = batteryVoltage();
             RCSOFTCHECK(rcl_publish(&publisher, &battery_msg, NULL));
             printf("Sent: %f\n", battery_msg.data);
-            
+            return;
+        }
             //run motor,
             motorControl(msg.linear.x,msg.angular.z);
     }
