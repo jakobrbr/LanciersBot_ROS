@@ -168,7 +168,7 @@ void setup(){
             "/batt_volt"));
 
         // Create timer.
-        rcl_timer_t timer = rcl_get_zero_initialized_timer();
+        rcl_timer_t timer;
         const unsigned int timer_timeout = 100;
         RCCHECK(rclc_timer_init_default(
             &timer,
@@ -186,8 +186,8 @@ void setup(){
 
         while (1)
         {
-            rclc_executor_spin_some(&executor, RCL_MS_TO_NS(1));
-            usleep(RCL_MS_TO_NS(1000));
+            rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10));
+            usleep(10*1000);
         }
         // free mem
         RCCHECK(rcl_subscription_fini(&subscriber, &node));
