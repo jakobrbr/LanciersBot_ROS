@@ -61,7 +61,7 @@
 #define PWM_resolution LEDC_TIMER_10_BIT
 #define PWM_timer LEDC_TIMER_1
 #define PWM_FREQ 30000
-#define PWM_spdMode LEDC_LOW_SPEED_MODE
+#define PWM_spdMode LEDC_LOW_HIGH_MODE
 #define PWM_min 600
 #define PWM_max 1023
 
@@ -238,16 +238,18 @@ float batteryVoltage()
 }
 void exitSleepMode(void)
 {
-    // exit sleepmode
-    gpio_set_level(PinL1, 1);
-    gpio_set_level(PinL2, 1);
-    gpio_set_level(PinR1, 1);
-    gpio_set_level(PinR2, 1);
+    // exit sleepmode by writing a 100% dutycycle to each pin.
+    ledc_set_duty(PWM_spdMode, PWM_L1, PWM_max);
+    ledc_set_duty(PWM_spdMode, PWM_L2, PWM_max);
+    ledc_set_duty(PWM_spdMode, PWM_R1, PWM_max);
+    ledc_set_duty(PWM_spdMode, PWM_R2, PWM_max);
+    //update the PWM channels
+    ledc_update_duty(PWM_spdMode, PWM_L1);
+    ledc_update_duty(PWM_spdMode, PWM_L2);
+    ledc_update_duty(PWM_spdMode, PWM_R1);
+    ledc_update_duty(PWM_spdMode, PWM_R2);
     // wait for 1ms for motor to enable
     vTaskDelay(1 / portTICK_RATE_MS);
-
-    // reattach pwm pins
-    PWMsetup();
 }
 void motorControl(float vel, float a)
 {
@@ -270,12 +272,12 @@ void motorControl(float vel, float a)
     uint16_t pwmRight = (uint16_t)((fabs(rVel)) * (PWM_max - PWM_min) / (1) + PWM_min);
 
     exitSleepMode();
-
+    //sets the dutycycle of the motors to match the recieved wheel velocities.
     ledc_set_duty(PWM_spdMode, PWM_L1, pwmLeft * (lVel > 0));
     ledc_set_duty(PWM_spdMode, PWM_L2, pwmLeft * (lVel < 0));
     ledc_set_duty(PWM_spdMode, PWM_R1, pwmRight * (rVel > 0));
     ledc_set_duty(PWM_spdMode, PWM_R2, pwmRight * (rVel < 0));
-
+    //update the PWM channels
     ledc_update_duty(PWM_spdMode, PWM_L1);
     ledc_update_duty(PWM_spdMode, PWM_L2);
     ledc_update_duty(PWM_spdMode, PWM_R1);
