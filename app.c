@@ -105,6 +105,7 @@ void setup(){
     gpio_set_level(PinL2,1);
     gpio_set_level(PinR1,1);
     gpio_set_level(PinR2,1);
+    vTaskDelay(1 / portTICK_RATE_MS); //wait for 1ms
 
     // pwm timer struct set to match motor drivers.
     ledc_timer_config_t ledc_timer = {
