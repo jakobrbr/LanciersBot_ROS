@@ -106,7 +106,11 @@ void setup(){
     gpio_set_level(PinR1,1);
     gpio_set_level(PinR2,1);
     vTaskDelay(1 / portTICK_RATE_MS); //wait for 1ms
-
+    //reset gpio mode
+    gpio_reset_pin(PinL1);
+    gpio_reset_pin(PinL2);
+    gpio_reset_pin(PinR1);
+    gpio_reset_pin(PinR2);
     // pwm timer struct set to match motor drivers.
     ledc_timer_config_t ledc_timer = {
         .duty_resolution = PWM_resolution,
