@@ -66,10 +66,10 @@
 #define PWM_max 1023
 
 // setting PWM channels
-#define PWM_R1 LEDC_CHANNEL_0
+#define PWM_R1 LEDC_CHANNEL_1
 #define PWM_R2 LEDC_CHANNEL_2
-#define PWM_L1 LEDC_CHANNEL_4
-#define PWM_L2 LEDC_CHANNEL_7
+#define PWM_L1 LEDC_CHANNEL_3
+#define PWM_L2 LEDC_CHANNEL_4
 
 #define timer_timeout 100
 
@@ -267,8 +267,8 @@ void motorControl(float vel, float a)
     float rVel = (norm_vel + norm_a) / 2.0f;
 
     // map velocity to pwm
-    uint16_t pwmLeft = (uint16_t)((fabs(lVel)) * (PWM_max - PWM_min) / (1) + PWM_min);
-    uint16_t pwmRight = (uint16_t)((fabs(rVel)) * (PWM_max - PWM_min) / (1) + PWM_min);
+    uint16_t pwmLeft = (uint16_t)((fabs(lVel)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
+    uint16_t pwmRight = (uint16_t)((fabs(rVel)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
 
     exitSleepMode();
     //sets the dutycycle of the motors to match the recieved wheel velocities.
