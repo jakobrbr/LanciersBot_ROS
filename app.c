@@ -168,7 +168,7 @@ void microRosTask()
 
     // create subscriber, expecting msg in format of /cmd_vel, connect to topic /cmd_vel
     // initiated to connect with best effort for faster communication
-    RCCHECK(rclc_subscription_init_best_effort(
+    RCCHECK(rclc_subscription_init_default(
         &subscriber,
         &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
