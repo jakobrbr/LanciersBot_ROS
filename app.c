@@ -87,17 +87,24 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void microRosTask();
 
 void setup(){
-    // TO DO define struct for setting motors
+    //set internals
     gpio_set_direction(stayOn, GPIO_MODE_OUTPUT);
     gpio_set_direction(vSens, GPIO_MODE_INPUT);
     adc1_config_width(ADC_WIDTH_BIT_12);
     adc1_config_channel_atten(vSens, ADC_ATTEN_DB_0);
     gpio_set_level(stayOn, 1);
 
+    //set all pwm outouts
     gpio_set_direction(PinL1, GPIO_MODE_OUTPUT);
     gpio_set_direction(PinL2, GPIO_MODE_OUTPUT);
     gpio_set_direction(PinR1, GPIO_MODE_OUTPUT);
     gpio_set_direction(PinR2, GPIO_MODE_OUTPUT);
+    
+    //exit sleepmode
+    gpio_set_level(PinL1,1);
+    gpio_set_level(PinL2,1);
+    gpio_set_level(PinR1,1);
+    gpio_set_level(PinR2,1);
 
     // pwm timer struct set to match motor drivers.
     ledc_timer_config_t ledc_timer = {
