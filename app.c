@@ -57,11 +57,6 @@
 #define PinL1 26 // Forward left
 #define PinL2 25 // Backwards left
 
-#define LEDC_OUTPUT_IO PinR1
-#define LEDC_OUTPUT_IO PinR2
-#define LEDC_OUTPUT_IO PinL1
-#define LEDC_OUTPUT_IO PinL2
-
 // PWM parameters
 #define PWM_resolution LEDC_TIMER_10_BIT
 #define PWM_timer LEDC_TIMER_1
@@ -75,6 +70,8 @@
 #define PWM_R2 LEDC_CHANNEL_2
 #define PWM_L1 LEDC_CHANNEL_4
 #define PWM_L2 LEDC_CHANNEL_7
+
+#define timer_timeout 100
 
 rcl_publisher_t publisher;
 std_msgs__msg__Float32 battery_msg;
@@ -96,6 +93,11 @@ void setup(){
     adc1_config_width(ADC_WIDTH_BIT_12);
     adc1_config_channel_atten(vSens, ADC_ATTEN_DB_0);
     gpio_set_level(stayOn, 1);
+
+    gpio_set_direction(PinL1, GPIO_MODE_OUTPUT);
+    gpio_set_direction(PinL2, GPIO_MODE_OUTPUT);
+    gpio_set_direction(PinR1, GPIO_MODE_OUTPUT);
+    gpio_set_direction(PinR2, GPIO_MODE_OUTPUT);
 
     // pwm timer struct set to match motor drivers.
     ledc_timer_config_t ledc_timer = {
@@ -169,7 +171,6 @@ void setup(){
 
         // Create timer.
         rcl_timer_t timer;
-        const unsigned int timer_timeout = 100;
         RCCHECK(rclc_timer_init_default(
             &timer,
             &support,
@@ -212,7 +213,7 @@ void setup(){
             return;
         }
             //run motor,
-            motorControl(msg.linear.x,msg.angular.z);
+        else motorControl(msg.linear.x,msg.angular.z);
     }
     // Calculates the current battery voltage
     float batteryVoltage(){
