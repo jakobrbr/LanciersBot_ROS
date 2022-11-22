@@ -61,7 +61,7 @@
 #define PWM_resolution LEDC_TIMER_10_BIT
 #define PWM_timer LEDC_TIMER_1
 #define PWM_FREQ 30000
-#define PWM_spdMode LEDC_HIGH_SPEED_MODE
+#define PWM_spdMode LEDC_LOW_SPEED_MODE
 #define PWM_min 600
 #define PWM_max 1023
 
@@ -77,7 +77,7 @@ rcl_publisher_t publisher;
 std_msgs__msg__Float32 battery_msg;
 
 rcl_subscription_t subscriber;
-geometry_msgs__msg__Twist msg;
+geometry_msgs__msg__Twist Twist_msg;
 
 void GPIOsetup();
 void PWMsetup();
@@ -191,7 +191,7 @@ void microRosTask()
     // Create Executor.
     rclc_executor_t executor;
     RCCHECK(rclc_executor_init(&executor, &support.context, 2, &allocator));
-    RCCHECK(rclc_executor_add_subscription(&executor, &subscriber, &msg, &cmd_vel_callback, ON_NEW_DATA));
+    RCCHECK(rclc_executor_add_subscription(&executor, &subscriber, &Twist_msg, &cmd_vel_callback, ON_NEW_DATA));
     RCCHECK(rclc_executor_add_timer(&executor, &timer));
 
     battery_msg.data = 0;
@@ -211,8 +211,8 @@ void microRosTask()
 
 void cmd_vel_callback(const void *msgin)
 {
-    const geometry_msgs__msg__Twist *msg = (const geometry_msgs__msg__Twist *)msgin;
-    printf("Message received: %f %f\n", msg->linear.x, msg->angular.z);
+    const geometry_msgs__msg__Twist *Twist_msg = (const geometry_msgs__msg__Twist *)msgin;
+    printf("Message received: %f %f\n", Twist_msg->linear.x, Twist_msg->angular.z);
 }
 
 void timer_callback(rcl_timer_t *timer, int64_t last_call_time)
@@ -226,8 +226,7 @@ void timer_callback(rcl_timer_t *timer, int64_t last_call_time)
         return;
     }
     // run motor,
-    else
-        motorControl(msg.linear.x, msg.angular.z);
+    else motorControl(Twist_msg.linear.x, Twist_msg.angular.z);
 }
 // Calculates the current battery voltage
 float batteryVoltage()
