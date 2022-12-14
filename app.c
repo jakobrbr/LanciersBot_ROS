@@ -57,6 +57,10 @@
 #define PinL1 26 // Forward left
 #define PinL2 25 // Backwards left
 
+// Define the wheel radius and track width [m]
+#define R 0.075
+#define T 0.23
+
 // PWM parameters
 #define PWM_resolution LEDC_TIMER_10_BIT
 #define PWM_timer LEDC_TIMER_1
@@ -252,30 +256,27 @@ void exitSleepMode(void)
 }
 void motorControl(float vel, float a)
 {
-    /* this is code for steering the robot
-     * it calculates what pwm values to output, but not for how long
-     * vel is the linear velocity and is a value between -1 and 1, with 1 being top speed forward.
-     * a is the angle and is a value between -1 and 1. right is -1 and left is 1
-     */
-    // takes input of linear velocity and angle
-    // all of this code has been taken from github.com/Reinbert/ros_esp32cam_diffdrive
+    // Calculate the forward kinematics for the vehicle and write pwm
+
+    // should we constrain both values to [-1,1]??
+    // github.com/Reinbert/ros_esp32cam_diffdrive
     float norm_vel = constrain(vel, -1, 1);
     float norm_a = constrain(a, -1, 1);
-
-    // calculate wheel velocities
-    float lVel = (norm_vel - norm_a) / 2.0f; // taken from github - use wheel distance/size??
-    float rVel = (norm_vel + norm_a) / 2.0f;
+    // Calculate wheel velocities
+    float wL = (2*vel - T*a)/(2*R); // 2=> 2.0f?
+    float wR = (2*vel + T*a)/(2*R);
 
     // map velocity to pwm
-    uint16_t pwmLeft = (uint16_t)((fabs(lVel)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
-    uint16_t pwmRight = (uint16_t)((fabs(rVel)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
+    uint16_t pwmLeft = (uint16_t)((fabs(wL)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
+    uint16_t pwmRight = (uint16_t)((fabs(wR)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
+
 
     exitSleepMode();
     //sets the dutycycle of the motors to match the recieved wheel velocities.
-    ledc_set_duty(PWM_spdMode, PWM_L1, pwmLeft * (lVel > 0));
-    ledc_set_duty(PWM_spdMode, PWM_L2, pwmLeft * (lVel < 0));
-    ledc_set_duty(PWM_spdMode, PWM_R1, pwmRight * (rVel > 0));
-    ledc_set_duty(PWM_spdMode, PWM_R2, pwmRight * (rVel < 0));
+    ledc_set_duty(PWM_spdMode, PWM_L1, pwmLeft * (wL > 0));
+    ledc_set_duty(PWM_spdMode, PWM_L2, pwmLeft * (wL < 0));
+    ledc_set_duty(PWM_spdMode, PWM_R1, pwmRight * (wR > 0));
+    ledc_set_duty(PWM_spdMode, PWM_R2, pwmRight * (wR < 0));
     //update the PWM channels
     ledc_update_duty(PWM_spdMode, PWM_L1);
     ledc_update_duty(PWM_spdMode, PWM_L2);
