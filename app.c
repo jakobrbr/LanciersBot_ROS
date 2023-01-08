@@ -266,8 +266,8 @@ void motorControl(float vel, float a)
     float norm_vel = constrain(vel, -1, 1);
     float norm_a = constrain(a, -1, 1);
     // Calculate wheel velocities
-    float wL = (2*vel - T*a)/(2*R); // 2=> 2.0f?
-    float wR = (2*vel + T*a)/(2*R);
+    float wL = (2.0f*vel - T*a)/(2*R); // 2=> 2.0f?
+    float wR = (2.0f*vel + T*a)/(2*R);
 
     // map velocity to pwm
     uint16_t pwmLeft = (uint16_t)((fabs(wL)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
