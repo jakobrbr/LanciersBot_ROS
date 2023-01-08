@@ -23,7 +23,10 @@
 #include <rcl/error_handling.h>
 #include <rmw_microros/rmw_microros.h>
 #include <std_msgs/msg/float32.h>
-#include <geometry_msgs/msg/twist.h>
+#include <geometry_msgs/msg/twist.h> // not used
+// custom message:
+#include <rigidbody_msgs/msg/RobotCmd.h>
+
 
 // macros functions, Constrain from arduino.h and RCCHECK from microros examples
 #define constrain(amt, low, high) ((amt) < (low) ? (low) : ((amt) > (high) ? (high) : (amt)))
@@ -81,7 +84,7 @@ rcl_publisher_t publisher;
 std_msgs__msg__Float32 battery_msg;
 
 rcl_subscription_t subscriber;
-geometry_msgs__msg__Twist Twist_msg;
+rigidbody_msgs__msg__RobotCmd RobotCmd_msg;
 
 void GPIOsetup();
 void PWMsetup();
@@ -175,7 +178,7 @@ void microRosTask()
     RCCHECK(rclc_subscription_init_default(
         &subscriber,
         &node,
-        ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+        ROSIDL_GET_MSG_TYPE_SUPPORT(rigidbody_msgs, msg, RobotCmd),
         "/robot0/cmd_vel"));
     // create publisher for returning batteryVoltage
     RCCHECK(rclc_publisher_init_default(
@@ -195,7 +198,7 @@ void microRosTask()
     // Create Executor.
     rclc_executor_t executor;
     RCCHECK(rclc_executor_init(&executor, &support.context, 2, &allocator));
-    RCCHECK(rclc_executor_add_subscription(&executor, &subscriber, &Twist_msg, &cmd_vel_callback, ON_NEW_DATA));
+    RCCHECK(rclc_executor_add_subscription(&executor, &subscriber, &RobotCmd_msg, &cmd_vel_callback, ON_NEW_DATA));
     RCCHECK(rclc_executor_add_timer(&executor, &timer));
 
     battery_msg.data = 0;
@@ -215,8 +218,8 @@ void microRosTask()
 
 void cmd_vel_callback(const void *msgin)
 {
-    const geometry_msgs__msg__Twist *Twist_msg = (const geometry_msgs__msg__Twist *)msgin;
-    printf("Message received: %f %f\n", Twist_msg->linear.x, Twist_msg->angular.z);
+    const rigidbody_msgs__msg__RobotCmd *RobotCmd_msg = (const rigidbody_msgs__msg__RobotCmd *)msgin;
+    printf("Message received: %f %f\n", RobotCmd_msg->linear, RobotCmd_msg->angular);
 }
 
 void timer_callback(rcl_timer_t *timer, int64_t last_call_time)
@@ -230,7 +233,7 @@ void timer_callback(rcl_timer_t *timer, int64_t last_call_time)
         return;
     }
     // run motor,
-    else motorControl(Twist_msg.linear.x, Twist_msg.angular.z);
+    else motorControl(RobotCmd_msg.linear, RobotCmd_msg.angular);
 }
 // Calculates the current battery voltage
 float batteryVoltage()
@@ -270,7 +273,7 @@ void motorControl(float vel, float a)
     uint16_t pwmLeft = (uint16_t)((fabs(wL)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
     uint16_t pwmRight = (uint16_t)((fabs(wR)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
 
-    
+
     exitSleepMode();
     //sets the dutycycle of the motors to match the recieved wheel velocities.
     ledc_set_duty(PWM_spdMode, PWM_L1, pwmLeft * (wL > 0));
