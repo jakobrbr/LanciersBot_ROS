@@ -15,6 +15,7 @@ ament_target_dependencies(${PROJECT_NAME}
   rclc
   std_msgs
   rmw_microxrcedds
+  rigidbody_msgs
   )
 
 install(TARGETS ${PROJECT_NAME}
