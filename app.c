@@ -168,7 +168,7 @@ void microRosTask()
 
     // create node
     rcl_node_t node;
-    RCCHECK(rclc_node_init_default(&node, "LanciersBot", "", &support));
+    RCCHECK(rclc_node_init_default(&node, "robot0", "", &support));
 
     // create subscriber, expecting msg in format of /cmd_vel, connect to topic /cmd_vel
     // initiated to connect with best effort for faster communication
@@ -176,7 +176,7 @@ void microRosTask()
         &subscriber,
         &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-        "/cmd_vel"));
+        "/robot0/cmd_vel"));
     // create publisher for returning batteryVoltage
     RCCHECK(rclc_publisher_init_default(
         &publisher,
@@ -270,7 +270,7 @@ void motorControl(float vel, float a)
     uint16_t pwmLeft = (uint16_t)((fabs(wL)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
     uint16_t pwmRight = (uint16_t)((fabs(wR)) * (PWM_max - PWM_min) / (1-0) + PWM_min);
 
-
+    
     exitSleepMode();
     //sets the dutycycle of the motors to match the recieved wheel velocities.
     ledc_set_duty(PWM_spdMode, PWM_L1, pwmLeft * (wL > 0));
