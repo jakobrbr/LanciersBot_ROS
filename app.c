@@ -25,7 +25,7 @@
 #include <std_msgs/msg/float32.h>
 #include <geometry_msgs/msg/twist.h> // not used
 // custom message:
-#include <rigidbody_msgs/msg/RobotCmd.h>
+#include <rigidbody_msgs/msg/robotcmd.h>
 
 
 // macros functions, Constrain from arduino.h and RCCHECK from microros examples
